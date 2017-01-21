@@ -56,7 +56,10 @@ func run(settings servicer.Settings) error {
 	}
 	thisPort := strconv.Itoa(settings.Api.Port)
 	defaultPort := strconv.Itoa(notApi)
-	fwd, _ := forward.New()
+	fwd, err := forward.New()
+	if err != nil {
+		return err
+	}
 
 	//
 	v1 := func(w http.ResponseWriter, req *http.Request) {
@@ -119,7 +122,24 @@ func run(settings servicer.Settings) error {
 		hs.Set("Content-Type", "application/json")
 
 		req.URL = uri
-		fwd.ServeHTTP(w, req)
+		if settings.Output.Mocking {
+			// TODO forward to a mock service that can be configured to return different results.
+			m := mock{
+				Settings: settings,
+				Forward: forwarding{
+					Host:    host,
+					Port:    port,
+					Domain:  domain,
+					From:    from,
+					To:      to,
+					Uri:     uri,
+					Headers: hs,
+				},
+			}
+			fmt.Fprintln(w, m.String())
+		} else {
+			fwd.ServeHTTP(w, req)
+		}
 	}
 
 	//

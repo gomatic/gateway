@@ -11,7 +11,7 @@ import (
 //
 func ok(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "%s.%s\n", MAJOR, servicer.VERSION)
+	fmt.Fprintf(w, "%s.%s\n", VERSION, servicer.VERSION)
 	return
 }
 

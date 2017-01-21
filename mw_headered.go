@@ -12,7 +12,7 @@ import (
 	"github.com/gorilla/context"
 )
 
-var version = fmt.Sprintf("%s.%s\n", MAJOR, servicer.VERSION)
+var version = fmt.Sprintf("%s.%s\n", VERSION, servicer.VERSION)
 
 //
 func headered(w http.ResponseWriter, req *http.Request) {

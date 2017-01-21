@@ -1,6 +1,8 @@
-export APP_NAME := $(patsubst service-gravity-%,%,$(notdir $(shell pwd)))
+export APP_NAME := $(patsubst %,%,$(notdir $(shell pwd)))
 DESC :=
 PROJECT_URL := "https://github.com/gomatic/$(APP_NAME)"
+
+SOURCES := $(wildcard *.go)
 
 .PHONY : build linux darwin run container
 .PHONY : help report
@@ -41,11 +43,15 @@ cmd/client/client: cmd/client/main.go
 
 #
 
-linux: service-linux-amd64 ## Compile Linux binary
+linux: GOOS := linux
+linux: GOARCH := amd64
+linux: gateway-$(GOOS)-$(GOARCH) ## Compile Linux binary
 
-darwin: service-darwin-amd64 ## Compile Darwin binary
+darwin: GOOS := darwin
+darwin: GOARCH := amd64
+darwin: gateway-$(GOOS)-$(GOARCH) ## Compile Darwin binary
 
-service-linux-amd64 service-darwin-amd64 service-$(GOOS)-$(GOARCH): $(SOURCES)
+gateway-$(GOOS)-$(GOARCH): $(SOURCES)
 	CGO_ENABLED=0 go build -ldflags="-s -w -X $(PACKAGE)" -a -installsuffix cgo -o $@
 
 container: ## Create Docker image from Linux binary.

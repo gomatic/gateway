@@ -2,12 +2,18 @@ package main
 
 import (
 	"github.com/gomatic/servicer/gateway"
+	"github.com/urfave/cli"
 )
 
 //
-const MAJOR = "1.3"
+const VERSION = "1.3"
 
 //
 func main() {
-	gateway.Main(run, "", "")
+	gateway.Main(run, func(app *cli.App) error {
+		app.Name = "gateway"
+		app.Usage = "A microservice gateway."
+		app.Version = VERSION
+		return nil
+	})
 }
