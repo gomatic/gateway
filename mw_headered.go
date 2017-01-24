@@ -12,8 +12,10 @@ import (
 	"github.com/gorilla/context"
 )
 
-var version = fmt.Sprintf("%s.%s\n", VERSION, servicer.VERSION)
-
+var (
+	version = fmt.Sprintf("%s.%s\n", VERSION, servicer.VERSION)
+	name    string = "gateway"
+)
 //
 func headered(w http.ResponseWriter, req *http.Request) {
 	now := time.Now()
@@ -44,7 +46,7 @@ func headered(w http.ResponseWriter, req *http.Request) {
 	requestId := fmt.Sprintf("%x%x%x%x", pth5[:4], qry5[:4], url5[:4], rnd5[:4])
 	context.Set(req, "X-Request-Id", requestId)
 
-	hs.Set("Server", "gw/sp")
+	hs.Set("Server", name)
 
 	hs.Set("X-Powered-By", version)
 	hs.Set("X-Request-Id", requestId)
