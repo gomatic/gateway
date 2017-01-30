@@ -3,8 +3,10 @@
 !.gitignore
 !.gitmodules
 !Makefile
+!Dockerfile
 !LICENSE
 !*.mk
 !*.go
 !*.md
+!*.yml
 !*/

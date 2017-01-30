@@ -45,24 +45,20 @@ cmd/client/client: cmd/client/main.go
 
 linux: GOOS := linux
 linux: GOARCH := amd64
-linux: gateway-$(GOOS)-$(GOARCH) ## Compile Linux binary
+linux: $(APP_NAME)-$(GOOS)-$(GOARCH) ## Compile Linux binary
 
 darwin: GOOS := darwin
 darwin: GOARCH := amd64
-darwin: gateway-$(GOOS)-$(GOARCH) ## Compile Darwin binary
+darwin: $(APP_NAME)-$(GOOS)-$(GOARCH) ## Compile Darwin binary
 
-gateway-$(GOOS)-$(GOARCH): $(SOURCES)
+$(APP_NAME)-$(GOOS)-$(GOARCH): $(SOURCES)
 	CGO_ENABLED=0 go build -ldflags="-s -w -X $(PACKAGE)" -a -installsuffix cgo -o $@
 
 container: ## Create Docker image from Linux binary.
 	$(MAKE) linux GOOS=linux GOARCH=amd64
 	docker build \
-		--build-arg BUILD_BRANCH=$(BRANCH) \
-		--build-arg BUILD_TIME=$(shell date +%Y%m%dt%H%M%S) \
-		--build-arg BUILD_URL=$(PROJECT_URL)/commit/$(COMMIT_ID) \
-		--build-arg BUILD_USER=$(USER) \
-		--build-arg BUILD_VERSION=$(VERSION) \
-    --tag $(APP_NAME)/$(BRANCH):latest .
+    --tag $(APP_NAME):latest .
+	docker tag $(APP_NAME):latest $(APP_NAME)/$(BRANCH):latest
 	docker tag $(APP_NAME)/$(BRANCH):latest $(APP_NAME)/$(BRANCH):$(VERSION)
 
 up: DAEMON=
@@ -71,7 +67,7 @@ up down:
 
 
 clean:
-	rm -f gateway cmd/client/client
+	rm -f $(APP_NAME) $(APP_NAME)-linux-* $(APP_NAME)-darwin-* cmd/client/client
 
 help: ## This help.
 	@echo $(APP_NAME)
