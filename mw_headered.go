@@ -8,14 +8,14 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gomatic/servicer"
 	"github.com/gorilla/context"
 )
 
 var (
-	version = fmt.Sprintf("%s.%s\n", VERSION, servicer.VERSION)
+	version        = fmt.Sprintf("%s\n", VERSION)
 	name    string = "gateway"
 )
+
 //
 func headered(w http.ResponseWriter, req *http.Request) {
 	now := time.Now()

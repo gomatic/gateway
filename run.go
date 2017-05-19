@@ -51,7 +51,7 @@ func run(settings servicer.Settings) error {
 
 	name = settings.Name
 
-	// Ensure that the deafult port is not the port of this servicer.
+	// Ensure that the default port is not the port of this servicer.
 	notApi := 3000
 	if settings.Api.Port == notApi {
 		notApi = 5000

@@ -5,13 +5,12 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gomatic/servicer"
 )
 
 //
 func ok(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "%s.%s\n", VERSION, servicer.VERSION)
+	fmt.Fprintf(w, "%s\n", VERSION)
 	return
 }
 
