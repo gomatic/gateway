@@ -17,7 +17,7 @@ func gatewayFailureCache(f http.HandlerFunc) negroni.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 		path := r.URL.Path
-		name, err := named(path)
+		_, name, _, err := named(path)
 		if when, hit := routes.Get(name); hit && err == nil {
 			until := -time.Now().Sub(when.(time.Time).Add(timeout))
 			hs := w.Header()

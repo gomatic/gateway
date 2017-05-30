@@ -25,7 +25,6 @@ var (
 	signingSecret = []byte("secret")
 	signingMethod = jwt.SigningMethodHS256
 	allowOrigins  = []string{}
-	iss           = "gateway"
 )
 
 func init() {
@@ -35,15 +34,19 @@ func init() {
 }
 
 //
-func named(path string) (string, error) {
+func named(path string) (string, string, string, error) {
 	parts := strings.Split(path, "/")
 	version := parts[1]
 
-	if len(parts) < 2 || len(version) < 1 || version != "v1" {
-		return "", errors.New("")
+	if len(parts) < 2 {
+		return "", "", "", errors.New("Invalid gateway path")
 	}
 
-	return parts[2], nil
+	if len(version) < 1 || version != "v1" {
+		return "", "", "", errors.New("Invalid service version")
+	}
+
+	return version, parts[2], strings.Join(parts[3:], "/"), nil
 }
 
 //
@@ -66,14 +69,14 @@ func run(settings servicer.Settings) error {
 	//
 	v1 := func(w http.ResponseWriter, req *http.Request) {
 		path := req.URL.Path
-		name, err := named(path)
+		_, name, servicePath, err := named(path)
 		if err != nil {
 			log.Printf("ERROR %+v: Invalid request: %+v : %+v", http.StatusInternalServerError, req, path)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
-		host, port, domain := "", "", settings.Dns.Namespace + "." + settings.Dns.Domain
+		host, port, domain := "", "", settings.Dns.Namespace+"."+settings.Dns.Domain
 
 		// Adhere to: http://kubernetes.io/docs/user-guide/services/#dns
 		// {{.Name}}.{{.Namespace}}.svc.cluster.local
@@ -110,7 +113,7 @@ func run(settings servicer.Settings) error {
 			}
 		}
 		from := req.URL
-		to := fmt.Sprintf("http://%s:%s%s?%s", host, port, from.Path, from.RawQuery)
+		to := fmt.Sprintf("http://%s:%s/%s?%s", host, port, servicePath, from.RawQuery)
 		log.Printf("forwarding %s to %s", from, to)
 
 		uri, err := url.ParseRequestURI(to)
@@ -124,6 +127,7 @@ func run(settings servicer.Settings) error {
 		hs.Set("Content-Type", "application/json")
 
 		req.URL = uri
+		req.RequestURI = uri.RequestURI()
 		if settings.Output.Mocking {
 			// TODO forward to a mock service that can be configured to return different results.
 			m := mock{
@@ -167,7 +171,6 @@ func run(settings servicer.Settings) error {
 	// Testing/debug routes
 
 	if settings.Output.Debugging {
-		root.HandleFunc("/token", token)
 		root.HandleFunc("/fail", fail)
 	}
 

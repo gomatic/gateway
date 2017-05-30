@@ -12,7 +12,6 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/context"
-	"github.com/pborman/uuid"
 )
 
 //
@@ -114,7 +113,7 @@ func validate(w http.ResponseWriter, req *http.Request) {
 
 	if auth_, exists := claim["auth"]; exists {
 		auth, ok = auth_.(string)
-		if ! ok {
+		if !ok {
 			log.Printf("auth key type-problem %[1]T %+[1]v", auth_)
 		}
 	}
@@ -144,48 +143,3 @@ func validate(w http.ResponseWriter, req *http.Request) {
 	return
 }
 
-//
-func token(w http.ResponseWriter, req *http.Request) {
-	now := time.Now().UTC()
-	duration := time.Duration(5)
-	q := req.URL.Query()
-	if d := q.Get("d"); d != "" {
-		if dur, err := strconv.Atoi(d); err == nil && dur < 60 && dur > 1 {
-			duration = time.Duration(dur)
-		}
-	}
-
-	sub := uuid.NewRandom().String()
-	iat := now.Unix()
-
-	// Create a secure, opaque aud so as not to expose internal services.
-
-	h := hmac.New(md5.New, []byte(signingSecret))
-	h.Write([]byte(sub))
-	h.Write([]byte(iss))
-	h.Write([]byte(fmt.Sprintf("%d", iat)))
-	aud := hex.EncodeToString(h.Sum(nil))
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub":         sub,
-		"aud":         aud,
-		"iss":         iss,
-		"iat":         iat,
-		"nbf":         now.Add(-duration * time.Minute).Unix(),
-		"exp":         now.Add(duration * time.Minute).Unix(),
-		"jti":         uuid.NewRandom().String(),
-	})
-
-	// Sign and get the complete encoded token as a string using the signingSecret
-	tokenString, err := token.SignedString(signingSecret)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintln(w, "Signing failed")
-		log.Printf("Token request: %+v\n%+v", req, err)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintln(w, tokenString)
-	return
-}
