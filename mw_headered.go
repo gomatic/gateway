@@ -8,11 +8,12 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gomatic/go-vbuild"
 	"github.com/gorilla/context"
 )
 
 var (
-	version        = fmt.Sprintf("%s\n", VERSION)
+	version        = build.Version.String()
 	name    string = "gateway"
 )
 
