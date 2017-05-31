@@ -50,17 +50,15 @@ func named(path string) (string, string, string, error) {
 }
 
 //
-func run(settings servicer.Settings) error {
-
+func v1(settings servicer.Settings) (func(w http.ResponseWriter, req *http.Request), error) {
 	name = settings.Name
 	thisPort := strconv.Itoa(settings.Api.Port)
 	fwd, err := forward.New()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	//
-	v1 := func(w http.ResponseWriter, req *http.Request) {
+	return func(w http.ResponseWriter, req *http.Request) {
 		path := req.URL.Path
 		_, name, servicePath, err := named(path)
 		if err != nil {
@@ -142,6 +140,18 @@ func run(settings servicer.Settings) error {
 		} else {
 			fwd.ServeHTTP(w, req)
 		}
+	}, nil
+}
+
+//
+func run(settings servicer.Settings) error {
+
+	name = settings.Name
+
+	//
+	v1, err := v1(settings)
+	if err != nil {
+		return nil
 	}
 
 	//
