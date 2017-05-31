@@ -12,8 +12,8 @@ import (
 
 // Caches 502 failures for five minutes.
 func gatewayFailureCache(f http.HandlerFunc) negroni.HandlerFunc {
-	timeout := 5 * time.Minute
-	routes := cache.New(timeout, 30*time.Second)
+	timeout := 2 * time.Minute                   // TODO parameterize this 2m timeout
+	routes := cache.New(timeout, 30*time.Second) // TODO parameterize this 30s interval
 
 	return func(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 		path := r.URL.Path

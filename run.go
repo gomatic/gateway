@@ -53,14 +53,7 @@ func named(path string) (string, string, string, error) {
 func run(settings servicer.Settings) error {
 
 	name = settings.Name
-
-	// Ensure that the default port is not the port of this servicer.
-	notApi := 3000
-	if settings.Api.Port == notApi {
-		notApi = 5000
-	}
 	thisPort := strconv.Itoa(settings.Api.Port)
-	defaultPort := strconv.Itoa(notApi)
 	fwd, err := forward.New()
 	if err != nil {
 		return err
@@ -87,6 +80,7 @@ func run(settings servicer.Settings) error {
 			log.Printf("SRV: %s:%+v", cname, addrs)
 			host = cname
 			if len(addrs) != 0 {
+				// TODO better handling of multiple addresses
 				port = strconv.Itoa(int(addrs[0].Port))
 			}
 		}
@@ -99,7 +93,9 @@ func run(settings servicer.Settings) error {
 		}
 		if port == "" {
 			if p, exists := os.LookupEnv(fmt.Sprintf("%s_SERVICE_PORT", strings.ToUpper(name))); !exists {
-				port = defaultPort
+				log.Printf("ERROR %+v: No port registered for %v", http.StatusNotFound, name)
+				w.WriteHeader(http.StatusNotFound)
+				return
 			} else {
 				port = p
 			}
