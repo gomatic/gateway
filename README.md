@@ -7,13 +7,13 @@
 
 ## Install
 
-    go install github.com/gomatic/gateway
+    go get github.com/gomatic/gateway
 
 ## Test
 
 **Install the example service**
 
-    go install github.com/gomatic/service-example
+    go get github.com/gomatic/service-example
 
 **Run the gateway**
 
@@ -50,7 +50,7 @@ debug routes
 
 **Install the example RPC client**
 
-    go install github.com/gomatic/service-example/cmd/service-example-client
+    go get github.com/gomatic/service-example/cmd/service-example-client
 
 **Call the example service through the RPC using the client helper**
 
