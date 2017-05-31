@@ -92,13 +92,13 @@ func run(settings servicer.Settings) error {
 			}
 		}
 		if port == "" {
-			if p, exists := os.LookupEnv(fmt.Sprintf("%s_SERVICE_PORT", strings.ToUpper(name))); !exists {
+			p, exists := os.LookupEnv(fmt.Sprintf("%s_SERVICE_PORT", strings.ToUpper(name)))
+			if !exists {
 				log.Printf("ERROR %+v: No port registered for %v", http.StatusNotFound, name)
 				w.WriteHeader(http.StatusNotFound)
 				return
-			} else {
-				port = p
 			}
+			port = p
 		}
 
 		if port == thisPort {

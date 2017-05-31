@@ -11,15 +11,15 @@ import (
 //
 type forwarding struct {
 	Host, Port, Domain string
-	From, Uri *url.URL
-	To        string
-	Headers   http.Header
+	From, Uri          *url.URL
+	To                 string
+	Headers            http.Header
 }
 
 //
 type mock struct {
-	Settings  servicer.Settings
-	Forward   forwarding
+	Settings servicer.Settings
+	Forward  forwarding
 }
 
 //

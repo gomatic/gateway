@@ -111,10 +111,10 @@ func validate(w http.ResponseWriter, req *http.Request) {
 
 	var auth string
 
-	if auth_, exists := claim["auth"]; exists {
-		auth, ok = auth_.(string)
+	if a, exists := claim["auth"]; exists {
+		auth, ok = a.(string)
 		if !ok {
-			log.Printf("auth key type-problem %[1]T %+[1]v", auth_)
+			log.Printf("auth key type-problem %[1]T %+[1]v", a)
 		}
 	}
 
@@ -142,4 +142,3 @@ func validate(w http.ResponseWriter, req *http.Request) {
 	log.Printf("Authenticated. Claim: %+v%s", claim, rel)
 	return
 }
-
