@@ -68,10 +68,13 @@ func run(settings servicer.Settings) error {
 	root := http.NewServeMux()
 
 	root.HandleFunc("/ok", ok)
+	root.HandleFunc("/index.html", ok)
 	root.HandleFunc("/health", ok)
+	root.HandleFunc("/health.html", ok)
 	root.HandleFunc("/health/", ok)
-	root.HandleFunc("/v1/health", ok)
-	root.HandleFunc("/v1/health/", ok)
+	root.HandleFunc("/healthcheck", ok)
+	root.HandleFunc("/healthcheck.html", ok)
+	root.HandleFunc("/healthcheck/", ok)
 	root.HandleFunc("/robots.txt", robots)
 	root.HandleFunc("/", notFound)
 
